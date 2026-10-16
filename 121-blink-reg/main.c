@@ -1,3 +1,6 @@
+/*  cmake -G "Unix Makefiles" .. 
+    Copy-Item .\121_blink_reg.uf2 D:\
+*/
 #include "hardware/gpio.h"
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
@@ -16,9 +19,18 @@ int main() {
   const uint32_t led_mask = 1u << LED_PIN;
 
   while (1) {
+    
     *gpio_out_set = led_mask;
     sleep_ms(250);
     *gpio_out_clr = led_mask;
     sleep_ms(1000);
+    
+    /* asm inline
+    __asm volatile ("str %1, [%0]" : : "r"(gpio_out_set), "r"(led_mask) : "memory");
+    sleep_ms(250);
+    __asm volatile ("str %1, [%0]" : : "r"(gpio_out_clr), "r"(led_mask) : "memory");
+    sleep_ms(1000);
+    */ 
+
   }
 }
