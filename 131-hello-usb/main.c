@@ -1,5 +1,5 @@
 /*  cmake -G "Unix Makefiles" ..
-    Copy-Item .\131-hello-usb.uf2 D:\
+    Copy-Item .\131_hello_usb.uf2 D:\
 */
 
 #include <stdio.h>

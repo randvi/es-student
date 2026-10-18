@@ -1,5 +1,5 @@
 /*  cmake -G "Unix Makefiles" ..
-    Copy-Item .\123_led-button.uf2 D:\
+    Copy-Item .\123_led_button.uf2 D:\
 */
 #include "hardware/gpio.h"
 #include "pico/stdlib.h"

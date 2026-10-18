@@ -11,7 +11,9 @@ Programming the RP2040 microcontroller in C using pico SDK
 ![](https://github.com/randvi/es-student/actions/workflows/check-1-2-3.yml/badge.svg)   
 ![](https://github.com/randvi/es-student/actions/workflows/check-1-3-1.yml/badge.svg)    
 ![](https://github.com/randvi/es-student/actions/workflows/check-1-3-2.yml/badge.svg)   
-![](https://github.com/randvi/es-student/actions/workflows/check-1-3-3.yml/badge.svg)   
+![](https://github.com/randvi/es-student/actions/workflows/check-1-3-3.yml/badge.svg)    
+![](https://github.com/randvi/es-student/actions/workflows/check-1-3-4.yml/badge.svg)   
+
 
 
 
