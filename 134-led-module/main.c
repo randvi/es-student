@@ -1,11 +1,12 @@
 /*  cmake -G "Unix Makefiles" ..
     Copy-Item .\134_led_module.uf2 D:\
 */
-#include <stdio.h>
 
+#include "log.h"
+#include <stdio.h>
 #include "hardware/gpio.h"
 #include "led.h"
-#include "log.h"
+
 #include "pico/stdlib.h"
 
 const uint BUTTON_PIN = 1;
@@ -28,7 +29,6 @@ void handle_command(int command) {
     log_version();
   }
   else {
-    //printf("unknown command: %c\n", command);
     LOG_ERR("unknown command: %c\n", command);
   }
 }
