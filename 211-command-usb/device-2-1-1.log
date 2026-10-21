@@ -1,0 +1,28 @@
+задание: 2.1.1
+проект: 211-command-usb
+устройство: 2e8a:000a
+серийный номер: 5033592712931F9F
+порт: COM17
+начало: 2026-10-22T00:29:06
+   0.000 --> enable
+   0.122 <-- enable
+   0.123 <-- dbg read_line:60 got enable
+   0.124 <-- inf handle_command:32 led on
+   2.151 --> disable
+   2.302 <-- disable
+   2.303 <-- dbg read_line:60 got disable
+   2.304 <-- inf handle_command:36 led off
+   4.340 --> info
+   4.423 <-- info
+   4.424 <-- dbg read_line:60 got info
+   4.424 <-- project: 211-command-usb
+   4.425 <-- repo: https://github.com/randvi/es-student
+   4.426 <-- board: pico
+   4.427 <-- serial: 5033592712931F9F
+   4.428 <-- chip: manufacturer 0x927, part 0x0002, revision 2
+   4.428 <-- pico-sdk: 2.3.0
+   6.456 --> nosuchcommand
+   6.724 <-- nosuchcommand
+   6.725 <-- dbg read_line:60 got nosuchcommand
+   6.727 <-- err handle_command:44 unknown command: nosuchcommand
+итог: отправлено команд 4, принято строк 17
