@@ -3,6 +3,7 @@
 */
 
 #include "log.h"
+#include "device.h"
 #include <stdio.h>
 #include "hardware/gpio.h"
 #include "led.h"
@@ -27,8 +28,9 @@ void handle_command(int command) {
     LOG_INF("led %s\n", led_is_on() ? "on" : "off");
   } else if (command == 'v') {
     log_version();
-  }
-  else {
+  } else if (command == 'i') {
+    device_info();
+  } else {
     LOG_ERR("unknown command: %c\n", command);
   }
 }
