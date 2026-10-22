@@ -13,6 +13,13 @@
 
 #define LINE_SIZE 32
 
+typedef void (*command_handler_t)(void);
+
+struct command_t {
+  const char* name;
+  command_handler_t handler;
+};
+
 const uint BUTTON_PIN = 1;
 const uint DEBOUNCE_MS = 20;
 
@@ -25,24 +32,51 @@ bool get_button_debounce(uint pin) {
   return state && gpio_get(pin);
 }
 
+void cmd_enable(void) {
+  // включаем светодиод и сообщаем новое состояние
+  led_set(true);
+  LOG_INF("led %s\n", led_is_on() ? "on" : "off");
+}
+
+void cmd_disable(void) {
+  // выключаем светодиод и сообщаем новое состояние
+  led_set(false);
+  LOG_INF("led %s\n", led_is_on() ? "on" : "off");
+}
+
+void cmd_info(void) {
+  // печатаем паспорт устройства
+  device_info();
+}
+
+void cmd_version(void) {
+  // печатаем строку журнала о версии прошивки
+  log_version();
+}
+
+void cmd_ping(void) { printf("pong\n"); }
+
+const struct command_t commands[] = {
+    {"enable", cmd_enable},
+    {"disable", cmd_disable},
+    {"info", cmd_info},
+    {"version", cmd_version},
+    {"ping", cmd_ping },
+};
+
+#define COMMAND_COUNT (sizeof(commands) / sizeof(commands[0]))
+
 void handle_command(const char* command) {
-  if (strcmp(command, "enable") == 0) {
-    // включаем светодиод и сообщаем новое состояние
-    led_set(true);
-    LOG_INF("led %s\n", led_is_on() ? "on" : "off");
-  } else if (strcmp(command, "disable") == 0) {
-    // выключаем светодиод и сообщаем новое состояние
-    led_set(false);
-    LOG_INF("led %s\n", led_is_on() ? "on" : "off");
-  } else if (strcmp(command, "info") == 0) {
-    // печатаем паспорт устройства
-    device_info();
-  } else if (strcmp(command, "version") == 0) {
-    // печатаем строку журнала о версии прошивки
-    log_version();
-  } else {
-    LOG_ERR("unknown command: %s\n", command);
+  for (uint i = 0; i < COMMAND_COUNT; i++) {
+    if (strcmp(command, commands[i].name) == 0) {
+      if (commands[i].handler != NULL) {
+        commands[i].handler();
+      }
+
+      return;
+    }
   }
+  LOG_ERR("unknown command: %s\n", command);
 }
 
 void read_line(void) {
@@ -58,7 +92,7 @@ void read_line(void) {
 
     if (line_length > 0) {
       LOG_DBG("got %s\n", line);
-      
+
       handle_command(line);
     }
 
