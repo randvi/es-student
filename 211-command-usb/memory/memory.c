@@ -3,9 +3,14 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "command.h"
+#include "device.h"
 #include "hardware/regs/addressmap.h"
 #include "pico/stdlib.h"
+
+int main(void);
 
 #define PICO_SRAM_SIZE_BYTES 264 * 1024
 #define PICO_ROM_SIZE_BYTES 16 * 1024
@@ -22,6 +27,9 @@ extern char __bss_end__;
 extern char __HeapLimit;
 extern char __StackBottom;
 extern char __StackTop;
+
+uint32_t data_variable = 100;
+uint32_t bss_variable;
 
 static void row(const char* name, uintptr_t start, uintptr_t end) {
   printf("%-10s 0x%08x 0x%08x %8u\n", name, (unsigned)start, (unsigned)end,
@@ -93,4 +101,48 @@ void mem_info(void) {
       (unsigned)((uintptr_t)&__HeapLimit - (uintptr_t)&__bss_end__);
   printf("  %-11s %8u for heap and %u for stack \n", "ram free", heap_size,
          stack_size);
+}
+
+void fw_info(void) {
+
+  // считаем вызов: data_variable и bss_variable на единицу больше
+  data_variable++;
+  bss_variable++;
+
+  // адреса функций со сброшенным признаком Thumb
+  uint16_t* main_code = (uint16_t*)((uintptr_t)main & ~1u);
+  uint16_t* fw_info_code = (uint16_t*)((uintptr_t)fw_info & ~1u);
+
+  // локальная переменная и блок из кучи
+  uint32_t stack_variable = 1946;
+  uint32_t* heap_variable = malloc(sizeof(uint32_t));
+  if (heap_variable != NULL) {
+    *heap_variable = 1951;
+  }
+
+  // шапка: объект, адрес, значение
+  printf("%-15s %-10s %-10s\n", "object", "address ", "value");
+  // main, fw_info  — адрес с признаком Thumb и два байта по сброшенному адресу
+  printf("%-15s 0x%08x 0x%x\n", "main", (void *)main, *main_code);
+  printf("%-15s 0x%08x 0x%x\n", "fw_info", (void *)fw_info, *fw_info_code);
+  // commands       — адрес массива
+  const struct command_t *p_commands = commands;
+  printf("%-15s 0x%08x\n", "commands", &commands);
+  // обработчики    — имя команды и адрес обработчика, строкой на команду
+  for (uint i = 0; i < command_count; i++) {
+    printf("- %-13s 0x%08x\n", commands[i].name, (void *)commands[i].handler);
+  }
+  // константы      — адрес и значение строк паспорта из device.h
+  printf("%-15s 0x%08x %s\n", "DEVICE_PROJECT", DEVICE_PROJECT, DEVICE_PROJECT);
+  printf("%-15s 0x%08x %s\n", "DEVICE_BOARD", DEVICE_BOARD, DEVICE_BOARD);
+  // data_variable  — адрес и значение, секция .data
+  printf("%-15s 0x%08x %u\n", "data_variable", &data_variable, data_variable);
+  // bss_variable   — адрес и значение, секция .bss
+  printf("%-15s 0x%08x %u\n", "bss_variable", &bss_variable, bss_variable);
+  // stack_variable — адрес и значение
+  printf("%-15s 0x%08x %u\n", "stack_variable", &stack_variable,stack_variable);
+  // heap_variable  — адрес и значение
+  printf("%-15s 0x%08x %u\n", "heap_variable", heap_variable, *heap_variable);
+  // возвращаем блок кучи
+  free(heap_variable);
 }
