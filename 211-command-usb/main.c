@@ -55,11 +55,13 @@ void cmd_mem_info(void) { mem_info(); }
 
 void cmd_fw_info(void) { fw_info(); }
 
+void cmd_dev_info(void) { dev_info(); }
+
 const struct command_t commands[] = {
     {"enable", cmd_enable},   {"disable", cmd_disable},
     {"info", cmd_info},       {"version", cmd_version},
     {"ping", cmd_ping},       {"mem_info", cmd_mem_info},
-    {"fw_info", cmd_fw_info},
+    {"fw_info", cmd_fw_info}, {"dev_info", cmd_dev_info}, 
 };
 
 const uint command_count = sizeof(commands) / sizeof(commands[0]);

@@ -104,7 +104,6 @@ void mem_info(void) {
 }
 
 void fw_info(void) {
-
   // считаем вызов: data_variable и bss_variable на единицу больше
   data_variable++;
   bss_variable++;
@@ -123,14 +122,14 @@ void fw_info(void) {
   // шапка: объект, адрес, значение
   printf("%-15s %-10s %-10s\n", "object", "address ", "value");
   // main, fw_info  — адрес с признаком Thumb и два байта по сброшенному адресу
-  printf("%-15s 0x%08x 0x%x\n", "main", (void *)main, *main_code);
-  printf("%-15s 0x%08x 0x%x\n", "fw_info", (void *)fw_info, *fw_info_code);
+  printf("%-15s 0x%08x 0x%x\n", "main", (void*)main, *main_code);
+  printf("%-15s 0x%08x 0x%x\n", "fw_info", (void*)fw_info, *fw_info_code);
   // commands       — адрес массива
-  const struct command_t *p_commands = commands;
+  const struct command_t* p_commands = commands;
   printf("%-15s 0x%08x\n", "commands", &commands);
   // обработчики    — имя команды и адрес обработчика, строкой на команду
   for (uint i = 0; i < command_count; i++) {
-    printf("- %-13s 0x%08x\n", commands[i].name, (void *)commands[i].handler);
+    printf("- %-13s 0x%08x\n", commands[i].name, (void*)commands[i].handler);
   }
   // константы      — адрес и значение строк паспорта из device.h
   printf("%-15s 0x%08x %s\n", "DEVICE_PROJECT", DEVICE_PROJECT, DEVICE_PROJECT);
@@ -140,7 +139,8 @@ void fw_info(void) {
   // bss_variable   — адрес и значение, секция .bss
   printf("%-15s 0x%08x %u\n", "bss_variable", &bss_variable, bss_variable);
   // stack_variable — адрес и значение
-  printf("%-15s 0x%08x %u\n", "stack_variable", &stack_variable,stack_variable);
+  printf("%-15s 0x%08x %u\n", "stack_variable", &stack_variable,
+         stack_variable);
   // heap_variable  — адрес и значение
   printf("%-15s 0x%08x %u\n", "heap_variable", heap_variable, *heap_variable);
   // возвращаем блок кучи
