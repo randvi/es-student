@@ -1,5 +1,6 @@
 
 #include "led.h"
+
 #include "hardware/gpio.h"
 
 const uint LED_PIN = 25;
@@ -19,3 +20,5 @@ void led_set(bool on) {
 void led_toggle(void) { led_set(!led_state); }
 
 bool led_is_on(void) { return led_state; }
+
+uint led_pin(void) { return LED_PIN; }
