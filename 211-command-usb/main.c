@@ -57,7 +57,7 @@ void cmd_fw_info(void) { fw_info(); }
 
 void cmd_dev_info(void) { dev_info(); }
 
-void cmd_boot_info() { boot_info(); }
+void cmd_boot_info(vid) { boot_info(); }
 
 const struct command_t commands[] = {
     {"enable", cmd_enable},       {"disable", cmd_disable},
