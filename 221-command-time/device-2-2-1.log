@@ -1,0 +1,26 @@
+задание: 2.2.1
+проект: 221-command-time
+устройство: 2e8a:000a
+серийный номер: E6611CB71F298628
+порт: COM21
+начало: 2026-10-29T00:06:10
+   0.000 --> clk_info
+   0.164 <-- clk_info
+   0.165 <-- dbg read_line:100 got clk_info
+   0.166 <-- signal     set_khz measured_khz
+   0.167 <-- clk_ref      12000        12001
+   0.168 <-- clk_sys     125000       125000
+   0.168 <-- clk_peri    125000       125000
+   0.170 <-- clk_usb      48000        48000
+   0.171 <-- clk_adc      48000        48000
+   0.172 <-- rosc             -         5365
+   2.027 --> info
+   2.110 <-- info
+   2.112 <-- dbg read_line:100 got info
+   2.112 <-- project: 221-command-time
+   2.114 <-- repo: https://github.com/randvi/es-student
+   2.114 <-- board: pico
+   2.115 <-- serial: E6611CB71F298628
+   2.116 <-- chip: manufacturer 0x927, part 0x0002, revision 2
+   2.116 <-- pico-sdk: 2.3.0
+итог: отправлено команд 2, принято строк 17
