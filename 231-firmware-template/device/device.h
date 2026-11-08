@@ -1,0 +1,24 @@
+#pragma once
+
+#include <stdint.h>
+
+#define DEVICE_NAME "es-cmd-module"
+#define FIRMWARE_VERSION "2.3.0"
+
+#define DEVICE_PROJECT "231-firmware-template"
+#define DEVICE_REPO "https://github.com/randvi/es-student"
+
+#ifndef DEVICE_BOARD
+#define DEVICE_BOARD "unknown"
+#endif
+
+
+struct info_t {
+  uint32_t version;
+  char name[13];
+  uint8_t revision;
+};
+
+extern struct info_t device_card;
+
+void device_info(void);
