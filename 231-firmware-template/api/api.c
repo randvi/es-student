@@ -1,11 +1,13 @@
 #include "api.h"
 
+#include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <errno.h>
+
 #include "device.h"
+#include "led-task.h"
 #include "pico/time.h"
 #include "profiling.h"
 
@@ -58,8 +60,8 @@ static double calc_pi(int n) {
 static void cmd_calc_pi(const command_t* command) {
   uint32_t terms = CALC_PI_TERMS;
 
-  if (command->argc != 0 && (command->argc > 1 || !parse_u32(command->argv[0], &terms))) {
-
+  if (command->argc != 0 &&
+      (command->argc > 1 || !parse_u32(command->argv[0], &terms))) {
     printf("error: usage calc_pi [terms]\n");
     return;
   }
@@ -68,8 +70,7 @@ static void cmd_calc_pi(const command_t* command) {
     printf("error: terms must be greater than 0\n");
     return;
   }
-  
-  
+
   uint64_t start_us = time_us_64();
   pi_result = calc_pi(terms);
   uint64_t spent_us = time_us_64() - start_us;
@@ -97,6 +98,44 @@ static void cmd_main_time_reset(const command_t* command) {
   printf("max reset\n");
 }
 
+static void print_led_state(void) {
+  led_state_t led_state = led_task_get_state();
+  printf("led: %s, period %lu ms\n", (led_state == LED_STATE_ON) ? "on" : ((led_state == LED_STATE_OFF) ? "off" : "blink"), led_task_get_period_ms());
+}
+
+
+static void cmd_led_enable(const command_t* command) {
+  led_task_set_state(LED_STATE_ON);
+  print_led_state();
+}
+
+static void cmd_led_disable(const command_t* command) {
+  led_task_set_state(LED_STATE_OFF);
+  print_led_state();
+}
+
+static void cmd_led_blink(const command_t* command) {
+  led_task_set_state(LED_STATE_BLINK);
+  print_led_state();
+}
+
+static void cmd_led_period(const command_t* command) {
+  uint32_t period_ms;
+
+  // parsing
+  if (command->argc != 1 || !parse_u32(command->argv[0], &period_ms)) {
+    printf("error: usage led_period <period_ms>\n");
+    return;
+  }
+
+  if (!led_task_set_period_ms(period_ms)) {
+    printf("error: period_ms must be greater than 0\n");
+    return;
+  }
+  // ответ: состояние и период светодиода
+  print_led_state();
+}
+
 const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", cmd_uptime},
@@ -104,6 +143,10 @@ const api_command_t api_commands[] = {
     {"main_time_exec", "superloop iteration: average and maximum",
      cmd_main_time_exec},
     {"main_time_reset", "reset maximum iteration", cmd_main_time_reset},
+    {"led_enable", "set the led state on", cmd_led_enable},
+    {"led_disable", "set the led state off", cmd_led_disable},
+    {"led_blink", "set the led state blink", cmd_led_blink},
+    {"led_period", "set led period blink", cmd_led_period},
 };
 
 const uint api_command_count = sizeof(api_commands) / sizeof(api_commands[0]);

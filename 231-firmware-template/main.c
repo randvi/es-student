@@ -6,21 +6,15 @@
 #include <string.h>
 
 #include "device.h"
-#include "led.h"
 #include "log.h"
 #include "pico/stdlib.h"
 #include "profiling.h"
 #include "stdio-text-protocol.h"
 #include "api.h"
+#include "led-task.h"
 
 
-
-const uint BLINK_HALF_PERIOD_MS = 500;
-
-
-uint64_t last_toggle_us = 0;
-
-
+/*
 void blink(void) {
   uint64_t now_us = time_us_64();
 
@@ -29,23 +23,23 @@ void blink(void) {
     led_toggle();
   }
 }
-
+*/
 int main() {
   // stdio
   stdio_init_all();
-  // led
-  //led_init();
-
+  
   //profiling_init();
   stdio_text_protocol_init();
-  
+  led_task_init();
+
   while (1) {
-  
+    
+    led_task_handle();
     const command_t* command = stdio_text_protocol_handle();
     if (command != NULL) {
 
       api_handle(command);
-      
+
     }
   }
 }
