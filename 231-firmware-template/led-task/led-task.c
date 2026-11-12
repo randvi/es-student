@@ -2,7 +2,7 @@
 
 #include "pico/stdlib.h"
 
-const uint LED_PIN = 25;
+const uint LED_PIN = 25; // 9
 
 static led_state_t led_state = LED_STATE_OFF;
 static uint64_t half_period_us;
@@ -85,3 +85,8 @@ bool led_task_set_period_ms(uint32_t period_ms) {
 }
 
 uint32_t led_task_get_period_ms(void) { return (half_period_us * 2) / 1000; }
+
+void led_task_next_state(void) {
+  led_state = (led_state + 1) % 3;
+  led_task_set_state(led_state);
+}

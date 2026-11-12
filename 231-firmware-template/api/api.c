@@ -8,6 +8,7 @@
 
 #include "device.h"
 #include "led-task.h"
+#include "button-task.h"
 #include "pico/time.h"
 #include "profiling.h"
 
@@ -100,9 +101,12 @@ static void cmd_main_time_reset(const command_t* command) {
 
 static void print_led_state(void) {
   led_state_t led_state = led_task_get_state();
-  printf("led: %s, period %lu ms\n", (led_state == LED_STATE_ON) ? "on" : ((led_state == LED_STATE_OFF) ? "off" : "blink"), led_task_get_period_ms());
+  printf("led: %s, period %lu ms\n",
+         (led_state == LED_STATE_ON)
+             ? "on"
+             : ((led_state == LED_STATE_OFF) ? "off" : "blink"),
+         led_task_get_period_ms());
 }
-
 
 static void cmd_led_enable(const command_t* command) {
   led_task_set_state(LED_STATE_ON);
@@ -136,6 +140,10 @@ static void cmd_led_period(const command_t* command) {
   print_led_state();
 }
 
+static void cmd_button(const command_t* command) {
+  printf("button: %s, presses %lu\n", button_task_is_pressed() ? "pressed" : "released", button_task_get_press_count());
+}
+
 const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", cmd_uptime},
@@ -147,6 +155,7 @@ const api_command_t api_commands[] = {
     {"led_disable", "set the led state off", cmd_led_disable},
     {"led_blink", "set the led state blink", cmd_led_blink},
     {"led_period", "set led period blink", cmd_led_period},
+    {"button", "button state and number of presses", cmd_button},
 };
 
 const uint api_command_count = sizeof(api_commands) / sizeof(api_commands[0]);
