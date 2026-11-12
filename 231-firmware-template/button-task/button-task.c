@@ -3,9 +3,15 @@
 #include "led-task.h"
 #include "pico/stdlib.h"
 
+typedef enum {
+    BUTTON_STATE_RELEASED,
+    BUTTON_STATE_PRESS,
+    BUTTON_STATE_PRESSED,
+    BUTTON_STATE_RELEASE,
+} button_state_t;
+
 const uint BUTTON_PIN = 15;  // 11
-const uint DEBOUNCE_MS = 20;
-const uint DEBOUNCE_US = DEBOUNCE_MS * 1000;
+const uint DEBOUNCE_US = 20000;
 
 static button_state_t button_state;
 static uint32_t presses = 0;
