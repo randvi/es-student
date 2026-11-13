@@ -6,9 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "button-task.h"
 #include "device.h"
 #include "led-task.h"
-#include "button-task.h"
+#include "pi-task.h"
 #include "pico/time.h"
 #include "profiling.h"
 
@@ -23,8 +24,6 @@ typedef struct {
 // прикидка: за член ряда 4 операции с double, 175 + 110 + 190 + 110 = 585
 // тактов; 1 000 000 членов по 585 тактов при 125 МГц — около 4,7 с
 static const uint CALC_PI_TERMS = 1000000;
-
-volatile double pi_result;
 
 static bool parse_u32(const char* text, uint32_t* value) {
   // strtoul приняла бы и знак: из "-1" получилось бы 4294967295
@@ -45,25 +44,12 @@ static bool parse_u32(const char* text, uint32_t* value) {
   return true;
 }
 
-static double calc_pi(int n) {
-  double sum = 0.0;
-  double sign = 1.0;
-
-  for (int k = 0; k < n; k++) {
-    // Прибавить очередной член ряда: ±1 / (2k + 1)
-    sum += sign / (2.0 * k + 1.0);
-    sign = -sign;
-  }
-  // Сумма ряда равна π/4
-  return 4.0 * sum;
-}
-
-static void cmd_calc_pi(const command_t* command) {
+static void cmd_pi_start(const command_t* command) {
   uint32_t terms = CALC_PI_TERMS;
 
   if (command->argc != 0 &&
       (command->argc > 1 || !parse_u32(command->argv[0], &terms))) {
-    printf("error: usage calc_pi [terms]\n");
+    printf("usage pi_start [<terms>]\n");
     return;
   }
 
@@ -72,12 +58,26 @@ static void cmd_calc_pi(const command_t* command) {
     return;
   }
 
-  uint64_t start_us = time_us_64();
-  pi_result = calc_pi(terms);
-  uint64_t spent_us = time_us_64() - start_us;
+  if (pi_task_start(terms)) {
+    printf("pi: started, %lu terms\n", terms);
+  } else {
+    printf("error: pi is busy\n");
+  }
 
-  printf("pi: %.9f\n", pi_result);
-  printf("time: %llu ms\n", spent_us / 1000);
+}
+
+static void cmd_pi(const command_t* command) {
+  if (!pi_task_is_started()) {
+    printf("pi: not started\n");
+    return;
+  }
+  double pi_res;
+  uint64_t pi_spend_us;
+  if (pi_task_get_result(&pi_res, &pi_spend_us)) {
+    printf("pi: %.9f in %llu ms\n", pi_res, pi_spend_us / 1000);
+  } else {
+    printf("pi: running\n");
+  }
 }
 
 static void cmd_info(const command_t* command) {
@@ -141,13 +141,16 @@ static void cmd_led_period(const command_t* command) {
 }
 
 static void cmd_button(const command_t* command) {
-  printf("button: %s, presses %lu\n", button_task_is_pressed() ? "pressed" : "released", button_task_get_press_count());
+  printf("button: %s, presses %lu\n",
+         button_task_is_pressed() ? "pressed" : "released",
+         button_task_get_press_count());
 }
 
 const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", cmd_uptime},
-    {"calc_pi", "calculate pi: calc_pi [terms]", cmd_calc_pi},
+    {"pi_start", "start calculate pi: pi_start [<terms>]", cmd_pi_start},
+    {"pi", "get pi result or state", cmd_pi},
     {"main_time_exec", "superloop iteration: average and maximum",
      cmd_main_time_exec},
     {"main_time_reset", "reset maximum iteration", cmd_main_time_reset},
