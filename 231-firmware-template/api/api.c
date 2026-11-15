@@ -82,21 +82,22 @@ static void cmd_pi(const command_t* command) {
 
 static void cmd_info(const command_t* command) {
   // печатаем паспорт устройства
-  device_info();
+  device_info_t device_card;
+  device_get_info(&device_card);
+  
+  printf("name: %s\n", DEVICE_NAME);
+  printf("version: %s\n", FIRMWARE_VERSION);
+  printf("project: %s\n", DEVICE_PROJECT);
+  printf("repo: %s\n", DEVICE_REPO);
+  printf("board: %s\n", device_card.board);
+  printf("serial: %s\n", device_card.board_id);
+  printf("chip: manufacturer 0x%lx, part 0x%lx, revision %d\n", device_card.manufacturer, device_card.part, device_card.revision);
+  printf("pico-sdk: %s\n", device_card.pico_sdk);
+
 }
 
 static void cmd_uptime(const command_t* command) {
   printf("uptime: %llu ms\n", time_us_64() / 1000);
-}
-
-static void cmd_main_time_exec(const command_t* command) {
-  printf("iteration avg %.2f us, max %u us\n", profiling_avg_us(),
-         (unsigned)profiling_max_us());
-}
-
-static void cmd_main_time_reset(const command_t* command) {
-  profiling_reset_max();
-  printf("max reset\n");
 }
 
 static void print_led_state(void) {
@@ -146,19 +147,35 @@ static void cmd_button(const command_t* command) {
          button_task_get_press_count());
 }
 
+static void cmd_profiling(const command_t* command) {
+  profiling_result_t result;
+  for (uint i = 0; i < profiling_stopwatch_count; i++) {
+    if (profiling_get(i, &result)) {
+     printf("%-12s count %-12lu mean %.2f us  max %lu us \n", result.name,
+      result.count, result.avg_us, result.max_us);
+    }
+  }
+
+}
+static void cmd_profiling_reset(const command_t* command) {
+  profiling_reset();
+}
+
+
+
 const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", cmd_uptime},
     {"pi_start", "start calculate pi: pi_start [<terms>]", cmd_pi_start},
     {"pi", "get pi result or state", cmd_pi},
-    {"main_time_exec", "superloop iteration: average and maximum",
-     cmd_main_time_exec},
-    {"main_time_reset", "reset maximum iteration", cmd_main_time_reset},
     {"led_enable", "set the led state on", cmd_led_enable},
     {"led_disable", "set the led state off", cmd_led_disable},
     {"led_blink", "set the led state blink", cmd_led_blink},
     {"led_period", "set led period blink", cmd_led_period},
     {"button", "button state and number of presses", cmd_button},
+    {"profiling", "shows all started stopwatch results since reset", cmd_profiling},
+    {"profiling_reset", "reset all stopwatch", cmd_profiling_reset},
+
 };
 
 const uint api_command_count = sizeof(api_commands) / sizeof(api_commands[0]);
