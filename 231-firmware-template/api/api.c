@@ -162,7 +162,6 @@ static void cmd_profiling_reset(const command_t* command) {
 }
 
 
-
 const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
     {"uptime", "time since reset", cmd_uptime},
