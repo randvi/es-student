@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "pico/types.h"
+
 
 #define STDIO_TEXT_PROTOCOL_LINE_SIZE 64
 #define STDIO_TEXT_PROTOCOL_MAX_ARGS 4

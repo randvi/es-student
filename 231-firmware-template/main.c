@@ -1,19 +1,24 @@
 /*  cmake -G "Unix Makefiles" ..
     Copy-Item .\231_firmware_template.uf2 D:\
+    arm-none-eabi-size .\231_firmware_template.elf.
 */
 
 #include <stdio.h>
 #include <string.h>
 
+#include "pico/stdlib.h"
+
+#include "firmware.h"
 #include "api.h"
 #include "button-task.h"
-#include "device.h"
+#include "device/device.h"
 #include "led-task.h"
-#include "log.h"
+#include "logging/log.h"
 #include "pi-task.h"
-#include "pico/stdlib.h"
-#include "profiling.h"
-#include "stdio-text-protocol.h"
+
+#include "profiling/profiling.h"
+#include "stdio-text-protocol/stdio-text-protocol.h"
+
 
 enum {
   STOPWATCH_LOOP,
@@ -27,9 +32,9 @@ int main() {
   // stdio
   stdio_init_all();
 
-  LOG_INF("%s %s\n", DEVICE_NAME, FIRMWARE_VERSION);
+  LOG_INF("%s %s\n", FIRMWARE_NAME, FIRMWARE_VERSION);
 
-  // profiling_init();
+
   profiling_stopwatch_init(STOPWATCH_LOOP, "loop");
   profiling_stopwatch_init(STOPWATCH_COMMAND, "command");
   profiling_stopwatch_init(STOPWATCH_LED, "led");

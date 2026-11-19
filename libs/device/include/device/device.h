@@ -1,13 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-#include "pico/version.h"
-
-#define DEVICE_NAME "es-cmd-module"
-#define FIRMWARE_VERSION "2.3.5"
-
-#define DEVICE_PROJECT "231-firmware-template"
-#define DEVICE_REPO "https://github.com/randvi/es-student"
 
 #ifndef DEVICE_BOARD
 #define DEVICE_BOARD "unknown"
@@ -19,7 +12,7 @@ typedef struct {
   uint32_t manufacturer;
   uint32_t part;
   uint8_t revision;
-  char pico_sdk[sizeof(PICO_SDK_VERSION_STRING) + 1];
+  char pico_sdk[10];
 } device_info_t;
 
 

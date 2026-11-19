@@ -1,7 +1,6 @@
-#include "profiling.h"
+#include "profiling/profiling.h"
 
 #include "pico/stdlib.h"
-
 
 typedef struct {
   const char* name;
@@ -24,6 +23,7 @@ void profiling_stopwatch_init(uint32_t id, const char* name) {
   profiling_stopwatches[id].max_us = 0;
 }
 
+#if PROFILING_ENABLED
 void profiling_start(uint32_t id) {
   profiling_stopwatches[id].previous_us = time_us_32();
 }
@@ -42,6 +42,13 @@ void profiling_stop(uint32_t id) {
       profiling_stopwatches[id].avg_sum + iteration_us;
 }
 
+#else
+
+// профилирование выключено: вызовы ничего не делают
+#define profiling_start(id) ((void)0)
+#define profiling_stop(id) ((void)0)
+#endif
+
 bool profiling_get(uint32_t id, profiling_result_t* result) {
   if (profiling_stopwatches[id].name == NULL) {
     return false;
@@ -57,7 +64,7 @@ bool profiling_get(uint32_t id, profiling_result_t* result) {
 void profiling_reset(void) {
   for (uint i = 0; i < profiling_stopwatch_count; i++) {
     profiling_stopwatches[i].count = 0;
-    //profiling_stopwatches[i].previous_us = 0;
+    // profiling_stopwatches[i].previous_us = 0;
     profiling_stopwatches[i].avg_sum = 0;
     profiling_stopwatches[i].max_us = 0;
   }

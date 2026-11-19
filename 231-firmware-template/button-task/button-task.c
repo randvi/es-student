@@ -2,6 +2,7 @@
 
 #include "led-task.h"
 #include "pico/stdlib.h"
+#include "systime/systime.h"
 
 typedef enum {
     BUTTON_STATE_RELEASED,
@@ -25,7 +26,7 @@ void button_task_init(void) {
 }
 
 static bool period_elapsed(uint64_t* last_us) {
-  uint64_t now_us = time_us_64();
+  uint64_t now_us = systime_us();
 
   if (now_us - *last_us < DEBOUNCE_US) {
     return false;
@@ -38,7 +39,7 @@ void button_task_handle(void) {
   // читаем уровень: нажатая кнопка замыкает вывод на землю и даёт ноль
   // читаем часы
   bool state = gpio_get(BUTTON_PIN);
-  uint64_t now_us = time_us_64();
+  uint64_t now_us = systime_us();
 
   switch (button_state) {
     // переходы по таблице; при переходе в «нажата»

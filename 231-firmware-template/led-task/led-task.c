@@ -1,6 +1,7 @@
 #include "led-task.h"
 
 #include "pico/stdlib.h"
+#include "systime/systime.h"
 
 const uint LED_PIN = 25; // 9
 
@@ -8,23 +9,7 @@ static led_state_t led_state = LED_STATE_OFF;
 static uint64_t half_period_us;
 static uint64_t last_toggle_us;
 
-static bool period_elapsed(uint64_t* last_us, uint64_t period_us) {
-  uint64_t now_us = time_us_64();
 
-  if (now_us - *last_us < period_us) {
-    return false;
-  }
-
-  // Следующее срабатывание отсчитывается от прошлого, а не от «сейчас»
-  *last_us += period_us;
-
-  // Отстали больше чем на период: не догонять, а начать отсчёт заново
-  if (now_us - *last_us >= period_us) {
-    *last_us = now_us;
-  }
-
-  return true;
-}
 
 void led_task_init(void) {
   // настраиваем вывод светодиода, период 1000 мс, состояние «мигает»
@@ -66,7 +51,7 @@ void led_task_handle(void) {
       // Светодиод установлен при входе в состояние, делать нечего
       break;
     case LED_STATE_BLINK:
-      if (period_elapsed(&last_toggle_us, half_period_us)) {
+      if (systime_period_elapsed(&last_toggle_us, half_period_us)) {
         gpio_put(LED_PIN, !gpio_get(LED_PIN));
       }
       break;
