@@ -55,7 +55,6 @@ target_include_directories(logic
 target_link_libraries(logic 
     PRIVATE 
       platform
-      pico_stdlib
       systime
       logging
       profiling
