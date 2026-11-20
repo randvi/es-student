@@ -1,27 +1,24 @@
 #include "button-task.h"
 
-#include "led-task.h"
-#include "pico/stdlib.h"
+#include "platform.h"
 #include "systime/systime.h"
 
 typedef enum {
-    BUTTON_STATE_RELEASED,
-    BUTTON_STATE_PRESS,
-    BUTTON_STATE_PRESSED,
-    BUTTON_STATE_RELEASE,
+  BUTTON_STATE_RELEASED,
+  BUTTON_STATE_PRESS,
+  BUTTON_STATE_PRESSED,
+  BUTTON_STATE_RELEASE,
 } button_state_t;
 
-const uint BUTTON_PIN = 15;  // 11
-const uint DEBOUNCE_US = 20000;
+const unsigned int DEBOUNCE_US = 20000;
 
 static button_state_t button_state;
 static uint32_t presses = 0;
 static uint64_t last_button_action_us;
+static button_task_callback_t button_task_on_press;
 
-void button_task_init(void) {
-  gpio_init(BUTTON_PIN);
-  gpio_set_dir(BUTTON_PIN, GPIO_IN);
-  gpio_pull_up(BUTTON_PIN);
+void button_task_init(button_task_callback_t on_press) {
+  button_task_on_press = on_press;
   button_state = BUTTON_STATE_RELEASED;
 }
 
@@ -38,7 +35,7 @@ static bool period_elapsed(uint64_t* last_us) {
 void button_task_handle(void) {
   // читаем уровень: нажатая кнопка замыкает вывод на землю и даёт ноль
   // читаем часы
-  bool state = gpio_get(BUTTON_PIN);
+  bool state = platform_button_read(); 
   uint64_t now_us = systime_us();
 
   switch (button_state) {
@@ -57,7 +54,7 @@ void button_task_handle(void) {
         if (period_elapsed(&last_button_action_us)) {
           button_state = BUTTON_STATE_PRESSED;
           presses++;
-          led_task_next_state();
+          button_task_on_press(); //led_task_next_state();
         }
       }
       break;

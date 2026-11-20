@@ -1,6 +1,5 @@
 #include "pi-task.h"
 
-#include "pico/stdlib.h"
 #include "systime/systime.h"
 
 #define PI_TERMS_PER_CALL 100
@@ -16,8 +15,8 @@ static uint64_t pi_task_start_us;
 static uint64_t pi_task_end_us;
 
 // Состояние расчёта: должно пережить возврат из обработчика
-bool pi_running = false;
-bool pi_ready = false;
+
+
 static int pi_k;
 static int pi_n;
 static double pi_sum;

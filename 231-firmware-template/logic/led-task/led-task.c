@@ -1,20 +1,15 @@
 #include "led-task.h"
 
-#include "pico/stdlib.h"
+#include "platform.h"
 #include "systime/systime.h"
-
-const uint LED_PIN = 25; // 9
 
 static led_state_t led_state = LED_STATE_OFF;
 static uint64_t half_period_us;
 static uint64_t last_toggle_us;
-
-
+static bool led_on = false;
 
 void led_task_init(void) {
-  // настраиваем вывод светодиода, период 1000 мс, состояние «мигает»
-  gpio_init(LED_PIN);
-  gpio_set_dir(LED_PIN, GPIO_OUT);
+  // настраиваем период 1000 мс, состояние «мигает»
   led_task_set_period_ms(1000);
   led_state = LED_STATE_BLINK;
   last_toggle_us = 0;
@@ -28,10 +23,12 @@ void led_task_set_state(led_state_t state) {
 
   switch (led_state) {
     case LED_STATE_OFF:
-      gpio_put(LED_PIN, false);
+      led_on = false;
+      platform_led_set(led_on);
       break;
     case LED_STATE_ON:
-      gpio_put(LED_PIN, true);
+      led_on = true;
+      platform_led_set(led_on);
       break;
     case LED_STATE_BLINK:
       // Первое переключение — на ближайшей итерации
@@ -52,7 +49,8 @@ void led_task_handle(void) {
       break;
     case LED_STATE_BLINK:
       if (systime_period_elapsed(&last_toggle_us, half_period_us)) {
-        gpio_put(LED_PIN, !gpio_get(LED_PIN));
+        led_on = !led_on;
+        platform_led_set(led_on);
       }
       break;
   }

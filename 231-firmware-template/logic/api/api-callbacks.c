@@ -1,31 +1,21 @@
-#include "api.h"
+#include "api-commands.h"
 
-#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
-#include <string.h>
 
-#include "button-task.h"
+#include "button-task/button-task.h"
 #include "device/device.h"
 #include "firmware.h"
-#include "led-task.h"
-#include "pi-task.h"
-#include "pico/time.h"
+#include "led-task/led-task.h"
+#include "pi-task/pi-task.h"
 #include "profiling/profiling.h"
 #include "systime/systime.h"
 
-typedef void (*api_callback_t)(const command_t* command);
-
-typedef struct {
-  const char* name;
-  const char* help;
-  api_callback_t callback;
-} api_command_t;
-
 // прикидка: за член ряда 4 операции с double, 175 + 110 + 190 + 110 = 585
 // тактов; 1 000 000 членов по 585 тактов при 125 МГц — около 4,7 с
-static const uint CALC_PI_TERMS = 1000000;
+static const uint32_t CALC_PI_TERMS = 1000000;
 
 static bool parse_u32(const char* text, uint32_t* value) {
   // strtoul приняла бы и знак: из "-1" получилось бы 4294967295
@@ -154,7 +144,7 @@ static void cmd_profiling(const command_t* command) {
     return;
   }
   profiling_result_t result;
-  for (uint i = 0; i < profiling_stopwatch_count; i++) {
+  for (uint32_t i = 0; i < profiling_stopwatch_count; i++) {
     if (profiling_get(i, &result)) {
       printf("%-12s count %-12lu mean %.2f us  max %lu us \n", result.name,
              result.count, result.avg_us, result.max_us);
@@ -180,34 +170,6 @@ const api_command_t api_commands[] = {
 
 };
 
-const uint api_command_count = sizeof(api_commands) / sizeof(api_commands[0]);
 
-void static help() {
-  printf("%-16s %s\n", "help", "list of commands");
-  for (uint32_t i = 0; i < api_command_count; i++) {
-    printf("%-16s %s\n", api_commands[i].name, api_commands[i].help);
-  }
-}
+const uint32_t api_command_count = sizeof(api_commands) / sizeof(api_commands[0]);
 
-void api_handle(const command_t* command) {
-  // truncated
-  if (command->truncated == true) {
-    printf("error: command longer than 63 characters or 4 arguments\n");
-    return;
-  }
-  // help
-  if (strcmp(command->name, "help") == 0) {
-    help();
-    return;
-  }
-  // looking up in the table commands
-  for (uint32_t i = 0; i < api_command_count; i++) {
-    if (strcmp(command->name, api_commands[i].name) == 0) {
-      api_commands[i].callback(command);
-      return;
-    }
-  }
-
-  // not found - unknown
-  printf("error: unknown command '%s', try help\n", command->name);
-}
