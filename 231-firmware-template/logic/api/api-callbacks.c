@@ -41,7 +41,7 @@ static void cmd_pi_start(const command_t* command) {
 
   if (command->argc != 0 &&
       (command->argc > 1 || !parse_u32(command->argv[0], &terms))) {
-    printf("usage pi_start [<terms>]\n");
+    printf("error: usage pi_start [<terms>]\n");
     return;
   }
 
@@ -82,7 +82,7 @@ static void cmd_info(const command_t* command) {
   printf("repo: %s\n", FIRMWARE_REPO);
   printf("board: %s\n", device_card.board);
   printf("serial: %s\n", device_card.board_id);
-  printf("chip: manufacturer 0x%lx, part 0x%lx, revision %d\n",
+  printf("chip: manufacturer 0x%03lx, part 0x%04lx, revision %u\n",
          device_card.manufacturer, device_card.part, device_card.revision);
   printf("pico-sdk: %s\n", device_card.pico_sdk);
 }
@@ -152,7 +152,10 @@ static void cmd_profiling(const command_t* command) {
   }
 }
 
-static void cmd_profiling_reset(const command_t* command) { profiling_reset(); }
+static void cmd_profiling_reset(const command_t* command) {
+   profiling_reset(); 
+   printf("profiling reset\n");
+  }
 
 const api_command_t api_commands[] = {
     {"info", "device passport", cmd_info},
