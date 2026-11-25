@@ -66,7 +66,7 @@ const command_t* stdio_text_protocol_handle(void) {
           if (command->argc < STDIO_TEXT_PROTOCOL_MAX_ARGS) {
             command->argv[command->argc] = p;
             command->argc++;
-            expect_new_word = false;  // start wors
+            expect_new_word = false;  // start words
             p++;
           } else {
             command->truncated = true;

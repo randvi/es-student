@@ -2,7 +2,7 @@
 
 #include "pico/stdlib.h"
 
-static const uint LED_PIN = 25; // 9
+static const uint LED_PIN = 25;     // 9
 static const uint BUTTON_PIN = 15;  // 11
 
 
